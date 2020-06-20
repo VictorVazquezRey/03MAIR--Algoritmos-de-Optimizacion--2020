@@ -12,14 +12,14 @@ def nearest_points_brute_force_1D(points:'nparray')->'nparray':
                 nearest_points = [points[i], points[j]]
                 positions = [i, j]
                 min_distance = actual_distance
-    return nearest_points, positions
+    return nearest_points, positions, min_distance
 
-def distance(points, i, j):
+def distance(points:'nparray', i:int, j:int)->float:
     return abs(points[i] - points[j])
 
 
 points = np.random.randint(1, 10001, size=1000)
-nearest_points, positions = nearest_points_brute_force_1D(points)
+nearest_points, positions, distance = nearest_points_brute_force_1D(points)
 print('Los puntos más cercanos son el', nearest_points[0], 'y el', 
       nearest_points[1], 'que están en la posición', positions[0],'y',
-      positions[1], 'respectivamente')
+      positions[1], 'respectivamente', 'y a una distancia de', distance)
