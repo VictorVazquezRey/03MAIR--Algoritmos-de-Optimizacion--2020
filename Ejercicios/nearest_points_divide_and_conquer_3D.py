@@ -52,7 +52,7 @@ def nearest_points(points: 'nparray') -> 'nparray':
 
 # Como la ordenación es estable en sorted a partir de este punto el array points
 # y todas sus vistas estarán ordenados según la coordenada x.
-def nearest_points_divide_and_conquer_2D(points: 'nparray') -> 'nparray':
+def nearest_points_divide_and_conquer_3D(points: 'nparray') -> 'nparray':
     points = np.array(sorted(points, key=lambda point:point[0]))
     return nearest_points(points)
 
@@ -69,8 +69,8 @@ def distance_1D(points:'nparray', i:int, j:int, axis: int=0)->float:
 
 
 # Esta instrucción ya obtiene 1000 puntos en 2D aleatorios con coordenadas entre 1 y 10000
-points = np.random.randint(1, 10001, size=(1000,2))
-nearest_points, distance = nearest_points_divide_and_conquer_2D(points)
+points = np.random.randint(1, 10001, size=(1000, 3))
+nearest_points, distance = nearest_points_divide_and_conquer_3D(points)
 
 print('Los puntos más cercanos son el', nearest_points[0], 'y el',
       nearest_points[1], 'que están a una distancia de', "{:.4f}".format(distance))
