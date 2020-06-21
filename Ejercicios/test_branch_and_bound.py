@@ -17,15 +17,15 @@ class MyTestCase(unittest.TestCase):
 
     def test_brach(self):
         node = Node((0,))
-        self.assertListEqual([Node((0, 1), 33, 35),
-                              Node((0, 2), 32, 36),
+        self.assertListEqual([Node((0, 2), 32, 36),
+                              Node((0, 1), 33, 35),
                               Node((0, 3), 33, 35)],
                              self.ta.branch(node))
 
         node = Node((0, 2))
-        self.assertEqual([Node((0, 2, 1), 34, 34),
-                          Node((0, 2, 3), 34, 34)],
-                         self.ta.branch(node))
+        self.assertListEqual([Node((0, 2, 1), 34, 34),
+                              Node((0, 2, 3), 34, 34)],
+                             self.ta.branch(node))
 
     def test_lower_bound_cost(self):
         max, min = self.ta.lower_and_upper_bound_cost((0, 1))

@@ -30,8 +30,7 @@ class Node:
 class Task_Asignament:
     dimension = None
     costs_matrix = None
-    root = []
-    childs = []
+    nodes = []
 
     def __init__(self, dimension, costs_matrix=None, less_cost=1, high_cost=25):
         self.dimension = dimension
@@ -66,23 +65,31 @@ class Task_Asignament:
 
     def branch(self, parent: Node) -> list:
         to_expand = set(range(self.dimension)) - set(parent.info)
-        childs = []
+        children = []
         for task in to_expand:
             info = parent.info + (task,)
             max, min = self.lower_and_upper_bound_cost(info)
             node = Node(info,min,max)
-            childs.append(node)
+            children.append(node)
 
-        return childs
+        return sorted(children)
 
-    def bound(self, childs:list)->list:
-        pass
+    def bound(self, ub: int)->list:
+        if self.nodes:
+            self.nodes = [e for e in self.nodes if e.lb < ub]
 
-    def assignaments(self) -> tuple:
-        min_cost = inf
-        result = ()
-
-        return result, min_cost
+    # def assignaments(self) -> list:
+    #     self.nodes = self.branch(Node()).sort()
+    #     solution = None
+    #     while self.nodes and not solution:
+    #         candidate = self.nodes.pop(0)
+    #         self.bound(candidate.ub)
+    #         if len(candidate.info) < self.dimension:
+    #             self.nodes += self.branch(candidate)
+    #             self.nodes.sort()
+    #         else:
+    #             return [candidate.info, candidate.ub]
+    #     return None
 
 
 # dimension = 4
