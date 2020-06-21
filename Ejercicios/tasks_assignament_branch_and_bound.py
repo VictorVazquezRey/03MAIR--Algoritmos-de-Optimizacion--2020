@@ -1,10 +1,32 @@
 import numpy as np
 from math import inf
 
+class Node:
+    info = ()
+    lb = 0
+    ub = 0
+
+    def __init__(self, info: tuple = (), lb: int = 0, up: int = 0):
+        self.info = info
+        self.lb = lb
+        self.ub = up
+
+    def __repr__(self):
+        return "Node(info:{},lb:{},ub:{})".format(self.info, self.lb, self.ub)
+
+    def __str__(self):
+        return "[info:{},lb:{},ub:{}]".format(self.info, self.lb, self.ub)
+
+    def __eq__(self, other):
+        if isinstance(other, Node):
+            return self.info == other.info and self.lb == other.lb and self.ub == other.ub
+        return False
 
 class Task_Asignament:
     dimension = None
     costs_matrix = None
+    root = []
+    childs = []
 
     def __init__(self, dimension, costs_matrix=None, less_cost=1, high_cost=25):
         self.dimension = dimension
@@ -37,15 +59,19 @@ class Task_Asignament:
 
         return fixed_cost + estimated_max_cost, fixed_cost + estimated_min_cost
 
-    def branch(self, parent: dict) -> list:
-        to_expand = set(range(self.dimension)) - set(parent['node'])
+    def branch(self, parent: Node) -> list:
+        to_expand = set(range(self.dimension)) - set(parent.info)
         childs = []
         for task in to_expand:
-            node = parent['node'] + (task,)
-            max, min = self.lower_and_upper_bound_cost(node)
-            childs.append({'node': node, 'lb': min, 'ub': max})
+            info = parent.info + (task,)
+            max, min = self.lower_and_upper_bound_cost(info)
+            node = Node(info,min,max)
+            childs.append(node)
 
         return childs
+
+    def bound(self, childs:list)->list:
+        pass
 
     def assignaments(self) -> tuple:
         min_cost = inf
