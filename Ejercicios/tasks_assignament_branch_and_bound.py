@@ -22,6 +22,11 @@ class Node:
             return self.info == other.info and self.lb == other.lb and self.ub == other.ub
         return False
 
+    def __lt__(self, other):
+        if isinstance(other, Node):
+            return self.lb < other.lb
+        return False
+
 class Task_Asignament:
     dimension = None
     costs_matrix = None
