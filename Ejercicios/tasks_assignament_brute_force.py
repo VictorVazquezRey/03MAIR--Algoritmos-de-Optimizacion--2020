@@ -24,6 +24,6 @@ def assignaments(cost_matrix:'nparray')->tuple:
 dimension = 4
 #generación automática y aleatoria de la matriz de costes.
 costs_matrix = np.random.randint(1, 26, size=(dimension, dimension))
-print(costs_matrix)
+# print(costs_matrix)
 assignament, assignament_cost = assignaments(costs_matrix)
 print('La mejor asignación de tareas es:', assignament,'con un coste total de:', assignament_cost)
