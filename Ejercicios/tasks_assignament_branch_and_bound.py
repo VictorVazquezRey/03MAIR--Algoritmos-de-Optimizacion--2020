@@ -1,5 +1,5 @@
 import numpy as np
-from math import inf
+
 
 class Node:
     info = ()
@@ -27,6 +27,7 @@ class Node:
             return self.lb < other.lb
         return False
 
+
 class Task_Asignament:
     dimension = None
     costs_matrix = None
@@ -40,7 +41,6 @@ class Task_Asignament:
                                                   size=(dimension, dimension))
         else:
             self.costs_matrix = costs_matrix
-
 
     def cost(self, assignament: tuple) -> float:
         cost = 0
@@ -69,29 +69,31 @@ class Task_Asignament:
         for task in to_expand:
             info = parent.info + (task,)
             max, min = self.lower_and_upper_bound_cost(info)
-            node = Node(info,min,max)
+            node = Node(info, min, max)
             children.append(node)
 
         return sorted(children)
 
-    def bound(self, ub: int)->list:
+    def bound(self, ub: int) -> list:
         if self.nodes:
             self.nodes = [e for e in self.nodes if e.lb < ub]
 
-    # def assignaments(self) -> list:
-    #     self.nodes = self.branch(Node()).sort()
-    #     solution = None
-    #     while self.nodes and not solution:
-    #         candidate = self.nodes.pop(0)
-    #         self.bound(candidate.ub)
-    #         if len(candidate.info) < self.dimension:
-    #             self.nodes += self.branch(candidate)
-    #             self.nodes.sort()
-    #         else:
-    #             return [candidate.info, candidate.ub]
-    #     return None
+    def assignaments(self) -> list:
+        self.nodes = self.branch(Node())
+        solution = None
+        while self.nodes and not solution:
+            candidate = self.nodes.pop(0)
+            self.bound(candidate.ub)
+            if len(candidate.info) < self.dimension:
+                self.nodes += self.branch(candidate)
+                self.nodes.sort()
+            else:
+                return [candidate.info, candidate.ub]
+        return None
 
 
-# dimension = 4
 # generación automática y aleatoria de la matriz de costes.
-# costs_matrix = np.random.randint(1, 26, size=(dimension, dimension))
+dimension = 100
+costs_matrix = np.random.randint(1, 26, size=(dimension, dimension))
+ta = Task_Asignament(dimension, costs_matrix)
+print(ta.assignaments())

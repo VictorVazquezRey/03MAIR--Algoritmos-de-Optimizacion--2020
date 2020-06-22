@@ -1,5 +1,5 @@
 import unittest
-from tasks_assignament_branch_and_bound import Node,Task_Asignament
+from tasks_assignament_branch_and_bound import Node, Task_Asignament
 import numpy as np
 
 
@@ -7,9 +7,9 @@ class MyTestCase(unittest.TestCase):
 
     def setUp(self) -> None:
         self.dimension = 4
-        self.costs_matrix = np.array([i for i in range(1, self.dimension * self.dimension + 1)])\
-                                    .reshape((self.dimension, self.dimension))
-        self.ta = Task_Asignament(self.dimension,costs_matrix=self.costs_matrix)
+        self.costs_matrix = np.array([i for i in range(1, self.dimension * self.dimension + 1)]) \
+            .reshape((self.dimension, self.dimension))
+        self.ta = Task_Asignament(self.dimension, costs_matrix=self.costs_matrix)
         # [[1  2  3  4]
         #  [5  6  7  8]
         #  [9 10 11 12]
@@ -32,9 +32,12 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(33, min)
         self.assertEqual(35, max)
 
-        max, min = self.ta.lower_and_upper_bound_cost( (0, 2, 1))
+        max, min = self.ta.lower_and_upper_bound_cost((0, 2, 1))
         self.assertEqual(34, min)
         self.assertEqual(34, max)
+
+    def test_assignament(self):
+        self.assertEqual([(1, 2, 0, 3), 34], self.ta.assignaments())
 
 
 if __name__ == '__main__':
