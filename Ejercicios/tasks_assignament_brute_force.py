@@ -21,7 +21,7 @@ def assignaments(cost_matrix:'nparray')->tuple:
     return result, min_cost
 
 
-dimension = 4
+dimension = 10
 #generación automática y aleatoria de la matriz de costes.
 costs_matrix = np.random.randint(1, 26, size=(dimension, dimension))
 # print(costs_matrix)

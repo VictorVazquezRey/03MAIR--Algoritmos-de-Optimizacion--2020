@@ -14,7 +14,7 @@ def cruiser(T:'nparray', origin_pier: int, target_pier: int) -> list:
 
         to_insert = [cost,[i] + C[i-pier][1]]
         C.append(to_insert)
-        # print(C)
+        print(C)
     return C.pop()
     
 

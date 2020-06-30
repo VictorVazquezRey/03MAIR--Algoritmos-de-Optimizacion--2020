@@ -1,4 +1,5 @@
 import numpy as np
+from math import inf
 
 
 class Node:
@@ -32,9 +33,11 @@ class Task_Asignament:
     dimension = None
     costs_matrix = None
     nodes = []
+    upper = inf
 
     def __init__(self, dimension, costs_matrix=None, less_cost=1, high_cost=25):
         self.dimension = dimension
+        self.upper = inf
         if costs_matrix is None:
             self.costs_matrix = np.random.randint(less_cost,
                                                   high_cost + 1,
@@ -42,12 +45,14 @@ class Task_Asignament:
         else:
             self.costs_matrix = costs_matrix
 
+    # O(len(assignament)
     def cost(self, assignament: tuple) -> float:
         cost = 0
         for agent, job in enumerate(assignament):
             cost += self.costs_matrix[agent][job]
         return cost
 
+    #O((n-len(assignament))^2)
     def lower_and_upper_bound_cost(self, assignament: tuple) -> tuple:
         fixed_cost = self.cost(assignament)
 
@@ -69,23 +74,29 @@ class Task_Asignament:
         for task in to_expand:
             info = parent.info + (task,)
             max, min = self.lower_and_upper_bound_cost(info)
-            node = Node(info, min, max)
-            children.append(node)
+            # Si cumple la condición de poda no se expande.
+            if min < self.upper:
+                if max < self.upper:
+                    self.upper = max
+                node = Node(info, min, max)
+                children.append(node)
+            # Esta condición es de solución y por tanto la poda puede ser más dramática.
+            elif min==max and min == self.upper:
+                self.nodes = []
+                return [Node(info, min, max)]
 
         return sorted(children)
-
-    def bound(self, ub: int) -> list:
-        if self.nodes:
-            self.nodes = [e for e in self.nodes if e.lb < ub]
 
     def assignaments(self) -> list:
         self.nodes = self.branch(Node())
         solution = None
         while self.nodes and not solution:
+            # print('expandidos:', self.nodes)
             candidate = self.nodes.pop(0)
-            self.bound(candidate.ub)
+            # print('candidato:', candidate, 'lsup:', self.upper)
             if len(candidate.info) < self.dimension:
-                self.nodes += self.branch(candidate)
+                b = self.branch(candidate)
+                self.nodes = self.nodes + b
                 self.nodes.sort()
             else:
                 return [candidate.info, candidate.ub]
@@ -93,7 +104,9 @@ class Task_Asignament:
 
 
 # generación automática y aleatoria de la matriz de costes.
-dimension = 100
+dimension = 15
+# costs_matrix = np.array([i for i in range(1, dimension * dimension + 1)]) \
+#                         .reshape((dimension, dimension))
 costs_matrix = np.random.randint(1, 26, size=(dimension, dimension))
 ta = Task_Asignament(dimension, costs_matrix)
 print(ta.assignaments())
