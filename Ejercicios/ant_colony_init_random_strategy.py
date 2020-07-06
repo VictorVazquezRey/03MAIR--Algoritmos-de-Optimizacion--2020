@@ -4,7 +4,7 @@ from operator import add
 import numpy as np
 from math import inf
 
-class AntColony:
+class AntColonyInitRandom:
     def __init__(self, tsp:TSP):
         self.tsp = tsp
         self.trails = {}
@@ -22,7 +22,7 @@ class AntColony:
         self.trails = {k: 1 for k in self.tsp.edges}
 
     def init_ants(self):
-        self.ants = [[0] for _ in range(self.number_of_ants)]
+        self.ants = [list(np.random.choice(self.tsp.dimension, 1)) for _ in range(self.number_of_ants)]
         self.ants_distances = [inf for _ in range(self.number_of_ants)]
 
     def desiderability(self, edge : tuple) -> float:
@@ -94,12 +94,9 @@ class AntColony:
         print(self.trails)
         return best_solution, distance_best_solution
 
-
-
-
 url = 'http://elib.zib.de/pub/mp-testdata/tsp/tsplib/tsp/swiss42.tsp'
 tsp = TSP(url)
-rs = AntColony(tsp)
+rs = AntColonyInitRandom(tsp)
 
 solution, distance = rs.ant_colony()
 print("La mejor solución es {} con una distancia de {}".format(solution, distance))
