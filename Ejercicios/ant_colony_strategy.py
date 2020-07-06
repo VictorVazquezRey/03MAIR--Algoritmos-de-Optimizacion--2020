@@ -3,13 +3,13 @@ from functools import reduce
 from operator import add
 import numpy as np
 from math import inf
-from itertools import combinations
 
 class AntColony:
     def __init__(self, tsp:TSP):
         self.tsp = tsp
         self.trails = {}
         self.ants = []
+        self.ants_distances = []
         self.alpha = .1
         self.beta = .1
         self.rho = .1
@@ -21,8 +21,12 @@ class AntColony:
     def init_trails(self):
         self.trails = {k: 1 for k in self.tsp.edges}
 
-    def init_ants(self, number_of_ants: int):
-        self.ants = [[0] for _ in range(number_of_ants)]
+    def init_ants(self):
+        self.ants = [[0] for _ in range(self.number_of_ants)]
+        self.ants_distances = [inf for _ in range(self.number_of_ants)]
+
+    def desiderability(self, edge : tuple) -> float:
+        return 1/self.tsp.weight(edge[0], edge[1])
 
     def choose_next_node(self, ant: int):
         # this calculates reachable edges from last position visited by ant
@@ -30,30 +34,33 @@ class AntColony:
         left_nodes = list(set(self.tsp.nodes)-set(self.ants[ant]))
         reachable_edges = [edge for edge in tsp.edges if edge[0] == last_node and edge[1] in left_nodes]
         # calculate denominator of probability term
-        sum_factors = reduce(add, [(self.trails[edge]**self.alpha) * ((1/self.tsp.weight(edge[0], edge[1]))**self.beta) for edge in reachable_edges])
+        sum_factors = reduce(add, [(self.trails[edge]**self.alpha) * (self.desiderability(edge)**self.beta) for edge in reachable_edges])
         # list of probabilities for each edge to be selected
-        probabilities = [(self.trails[edge]**self.alpha) * ((1/self.tsp.weight(edge[0], edge[1]))**self.beta) / sum_factors for edge in reachable_edges]
-        positions = list(range(len(probabilities)))
+        probabilities = [(self.trails[edge]**self.alpha) * (self.desiderability(edge)**self.beta) / sum_factors for edge in reachable_edges]
         # choice a position with calculated probabilities return a list of positions (only one because the second parameter)
-        to_return = np.random.choice(positions,
+        to_return = np.random.choice(range(len(probabilities)),
                                      1,
-                                     probabilities)
+                                     replace=False,
+                                     p=probabilities)
 
         return reachable_edges[to_return[0]][1]
 
-    def increase_trail(self, ant: int, distance: int):
-        ant_s = self.ants[ant]
-        ant_s_trails = [(ant_s[i], ant_s[i+1]) for i in range(self.tsp.dimension-1)]
-        ant_s_trails.append((ant_s[-1], 0))
+    def increase_trail(self):
+        for ant in range(self.number_of_ants):
+            ant_s = self.ants[ant]
+            ant_s_distance = self.ants_distances[ant]
 
-        self.trails = {k: v + (self.Q / distance) if k in ant_s_trails else v for k, v in self.trails.items()}
+            for i in range(self.tsp.dimension - 1):
+                self.trails[(ant_s[i], ant_s[i+1])] += self.Q / ant_s_distance
+
+            self.trails[(ant_s[-1], ant_s[0])] += self.Q / ant_s_distance
 
     def decrease_trails(self):
         self.trails = {k: max(v  - self.rho, self.initial_theta) for k, v in self.trails.items()}
 
     def ant_colony(self, number_of_ants: int = 42, alpha: float = 2, beta: float = 2,
-                   rho: float = .3, generations_number: int = 100, initial_theta: float = 0.1,
-                   q: float = 1000):
+                   rho: float = .2, generations_number: int = 20, initial_theta: float = 0.01,
+                   q: float = 500):
         self.alpha = alpha
         self.beta = beta
         self.rho = rho
@@ -65,28 +72,23 @@ class AntColony:
 
         best_solution = []
         distance_best_solution = inf
-        best_ant = -1
 
         for gen in range(self.generations_number):
-            self.init_ants(number_of_ants)
+            self.init_ants()
             for ant in range(number_of_ants):
-                for i in range(self.tsp.dimension - 1):
+                for _ in range(self.tsp.dimension - 1):
                     new_node = self.choose_next_node(ant)
                     self.ants[ant].append(new_node)
 
-            # select best ant
-            distance_best_ant = inf
-            for ant in range(number_of_ants):
-                actual_distance = self.tsp.distance(self.ants[ant])
-                if actual_distance < distance_best_ant:
-                    distance_best_ant = actual_distance
-                    best_ant = ant
-                if actual_distance < distance_best_solution:
-                    distance_best_solution = actual_distance
+                self.ants_distances[ant] = self.tsp.distance(self.ants[ant]) #Just to optimize calculations
+                # select best ant
+                if self.ants_distances[ant] < distance_best_solution:
+                    distance_best_solution = self.ants_distances[ant]
                     best_solution = self.ants[ant]
 
+            self.increase_trail()
             self.decrease_trails()
-            self.increase_trail(best_ant, distance_best_ant)
+
 
 
         print(self.trails)
