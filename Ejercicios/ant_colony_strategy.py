@@ -89,8 +89,6 @@ class AntColony:
             self.increase_trail()
             self.decrease_trails()
 
-
-
         print(self.trails)
         return best_solution, distance_best_solution
 

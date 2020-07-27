@@ -89,8 +89,6 @@ class AntColonyInitRandom:
             self.increase_trail()
             self.decrease_trails()
 
-
-
         print(self.trails)
         return best_solution, distance_best_solution
 
@@ -99,4 +97,10 @@ tsp = TSP(url)
 rs = AntColonyInitRandom(tsp)
 
 solution, distance = rs.ant_colony()
+for _ in range(10):
+    a_solution, a_distance = rs.ant_colony()
+    if a_distance < distance:
+        distance = a_distance
+        solution = a_solution
+
 print("La mejor solución es {} con una distancia de {}".format(solution, distance))
